@@ -19,6 +19,12 @@ app.get("/", function (req, res) {
 });
 
 
+app.get("/api/", function (req, res) {
+  let nowQ = new Date();
+  res.json({unix: nowQ.getTime(), utc: nowQ.toUTCString()});
+});
+
+
 // your first API endpoint... 
 app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
@@ -28,7 +34,13 @@ app.get("/api/hello", function (req, res) {
 app.get("/api/:date", function (req, res) {
   let dateQ = new Date(req.params.date);
 
-  if (dateQ.toString === "Invalid Date") {
+// dealing with epoch seconds, if provided date is actually epoch seconds this will catch it
+  if (dateQ.toString() === "Invalid Date") {
+    dateQ = new Date(+req.params.date);
+  }
+
+// OK still invalid, wasn't epoch seconds, fail
+  if (dateQ.toString() === "Invalid Date") {
     res.json({error: "Invalid Date"});
   } else {
     res.json({unix: dateQ.getTime(), utc: dateQ.toUTCString()});
